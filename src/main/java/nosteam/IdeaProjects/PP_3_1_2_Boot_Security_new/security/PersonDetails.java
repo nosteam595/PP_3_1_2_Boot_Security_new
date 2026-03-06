@@ -2,6 +2,7 @@ package nosteam.IdeaProjects.PP_3_1_2_Boot_Security_new.security;
 
 import nosteam.IdeaProjects.PP_3_1_2_Boot_Security_new.model.User;
 import org.jspecify.annotations.Nullable;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -48,5 +49,9 @@ public class PersonDetails implements UserDetails {
     @Override
     public boolean isEnabled() {
         return UserDetails.super.isEnabled();
+    }
+
+    public User getUser() {
+        return this.user;
     }
 }
