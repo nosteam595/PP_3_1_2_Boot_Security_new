@@ -1,21 +1,35 @@
 package nosteam.IdeaProjects.PP_3_1_2_Boot_Security_new.controllers;
 
 import jakarta.validation.Valid;
+import nosteam.IdeaProjects.PP_3_1_2_Boot_Security_new.model.Role;
 import nosteam.IdeaProjects.PP_3_1_2_Boot_Security_new.model.User;
+import nosteam.IdeaProjects.PP_3_1_2_Boot_Security_new.security.PersonDetails;
+import nosteam.IdeaProjects.PP_3_1_2_Boot_Security_new.services.RoleService;
 import nosteam.IdeaProjects.PP_3_1_2_Boot_Security_new.services.UserService;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Controller
 @RequestMapping("/users")
 public class UserController {
 
     private final UserService userService;
+    private final RoleService roleService;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, RoleService roleService, PasswordEncoder passwordEncoder) {
         this.userService = userService;
+        this.roleService = roleService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @GetMapping
@@ -25,25 +39,49 @@ public class UserController {
     }
 
     @GetMapping("/user/details")
-    public String getUser(@RequestParam long id, ModelMap model) {
-        model.addAttribute("user", userService.getUser(id));
-        return "userUpdateRemove";
+    public String showUserInfo(@RequestParam(value = "id", required = false) Long id,
+                               Authentication authentication,
+                               Model model) {
+        PersonDetails personDetails = (PersonDetails) authentication.getPrincipal();
+        User currentUser = personDetails.getUser();
+        User userToShow;
+        if (id != null && currentUser.getRoles().stream()
+                .anyMatch(r -> r.getName().equals("ROLE_ADMIN"))) {
+            userToShow = userService.getUser(id);
+        } else {
+            userToShow = currentUser;
+        }
+        model.addAttribute("user", userToShow);
+        return "userProfile";
     }
+
 
     @GetMapping("/add")
     public String addNewUser(ModelMap modelMap) {
         modelMap.addAttribute("user", new User());
+        modelMap.addAttribute("allRoles", roleService.getAllRoles());
         return "userAdd";
     }
 
     @PostMapping("/save")
     public String saveUser(@ModelAttribute("user") @Valid User user,
-                           BindingResult bindingResult) {
+                           BindingResult bindingResult,
+                           @RequestParam(value = "listRoles", required = false) List<Long> roleIds,
+                           Model model) {
+
         if (bindingResult.hasErrors()) {
-            // Если есть ошибки, возвращаем ту же форму (НЕ редирект!)
+            model.addAttribute("allRoles", roleService.getAllRoles());
             return "userAdd";
         }
-        //user.setPassword(passwordEncoder.encode(user.getPassword()));
+        if (roleIds != null) {
+            Set<Role> roles = new HashSet<>();
+            for (Long roleId : roleIds) {
+                roles.add(roleService.getRoleById(roleId));
+            }
+            user.setRoles(roles);
+        }
+
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         userService.addUser(user);
         return "redirect:/users";
     }

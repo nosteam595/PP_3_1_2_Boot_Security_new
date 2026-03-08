@@ -4,7 +4,6 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import nosteam.IdeaProjects.PP_3_1_2_Boot_Security_new.model.User;
 import org.springframework.stereotype.Repository;
-
 import java.util.List;
 
 @Repository

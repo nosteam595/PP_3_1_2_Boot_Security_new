@@ -9,5 +9,4 @@ public class Pp312BootSecurityNewApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(Pp312BootSecurityNewApplication.class, args);
 	}
-
 }

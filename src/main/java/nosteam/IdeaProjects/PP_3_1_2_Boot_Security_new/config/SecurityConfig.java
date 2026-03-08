@@ -3,10 +3,9 @@ package nosteam.IdeaProjects.PP_3_1_2_Boot_Security_new.config;
 import nosteam.IdeaProjects.PP_3_1_2_Boot_Security_new.services.PersonDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -15,9 +14,11 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     private final PersonDetailsService personDetailsService;
+    private final SuccessUserHandler successUserHandler;
 
-    public SecurityConfig(PersonDetailsService personDetailsService) {
+    public SecurityConfig(PersonDetailsService personDetailsService, SuccessUserHandler successUserHandler) {
         this.personDetailsService = personDetailsService;
+        this.successUserHandler = successUserHandler;
     }
 
     @Bean
@@ -25,12 +26,14 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/login", "/error").permitAll()
+                        .requestMatchers("/users/**").hasRole("ADMIN")
+                        .requestMatchers("/user/details").hasAnyRole("USER", "ADMIN")
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
                         .loginPage("/auth/login")
-                        .loginProcessingUrl("/process_login")
-                        .defaultSuccessUrl("/users", true)
+                        .loginProcessingUrl("/auth/login")
+                        .successHandler(successUserHandler)
                         .permitAll()
                 )
                 .logout(logout -> logout
@@ -38,13 +41,12 @@ public class SecurityConfig {
                         .logoutSuccessUrl("/auth/login")
                 )
                 .userDetailsService(personDetailsService);
-
         return http.build();
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return NoOpPasswordEncoder.getInstance();
+        return new BCryptPasswordEncoder();
     }
 }
 

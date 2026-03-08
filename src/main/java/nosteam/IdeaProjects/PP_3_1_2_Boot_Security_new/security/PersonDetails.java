@@ -2,12 +2,9 @@ package nosteam.IdeaProjects.PP_3_1_2_Boot_Security_new.security;
 
 import nosteam.IdeaProjects.PP_3_1_2_Boot_Security_new.model.User;
 import org.jspecify.annotations.Nullable;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
 import java.util.Collection;
-import java.util.List;
 
 public class PersonDetails implements UserDetails {
     private final User user;
@@ -18,7 +15,7 @@ public class PersonDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        return user.getRoles();
     }
 
     @Override

@@ -15,10 +15,9 @@
 
         h2 { color: #333; }
 
-        /* Стилизация таблицы */
         table {
-            width: 80%; /* Увеличение ширины для простора */
-            max-width: 900px;
+            width: 90%;
+            max-width: 1000px;
             border-collapse: collapse;
             background-color: #fff;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
@@ -30,7 +29,6 @@
             border-bottom: 1px solid #eee;
         }
 
-        /* Шапка таблицы */
         th {
             background-color: #f8f9fa;
             color: #555;
@@ -39,12 +37,18 @@
             letter-spacing: 0.5px;
         }
 
-        /* Зебра-эффект для строк */
+        .roles-badge {
+            background-color: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            margin-right: 3px;
+        }
+
         tbody tr:hover {
             background-color: #f1f7ff;
         }
 
-        /* Ссылки внутри таблицы */
         td a {
             color: #007bff;
             text-decoration: none;
@@ -55,20 +59,26 @@
             text-decoration: underline;
         }
 
-        /* Кнопка добавления */
         .btn-add {
             margin-top: 25px;
             padding: 10px 20px;
-            background-color: #28a745;
-            color: white;
             text-decoration: none;
             border-radius: 4px;
             font-weight: bold;
-            transition: background 0.2s;
+            background-color: #28a745;
+            color: white;
+            display: inline-block;
         }
 
-        .btn-add:hover {
-            background-color: #218838;
+        .btn-logout {
+            margin-top: 15px;
+            padding: 10px 20px;
+            background-color: #dc3545;
+            color: white;
+            border-radius: 4px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -80,29 +90,45 @@
     <thead>
     <tr>
         <th>ID</th>
-        <th>Имя</th>
+        <th>Имя (Детали)</th>
         <th>Фамилия</th>
         <th>Почта</th>
         <th>Возраст</th>
+        <th>Роли</th>
     </tr>
     </thead>
     <tbody>
     <tr th:each="user : ${users}">
         <td th:text="${user.id}">1</td>
-        <!-- Имя как ссылка на редактирование -->
         <td>
+            <!-- ИСПРАВЛЕНО: Ссылка ведет на /user/details с передачей ID -->
             <a th:href="@{/users/user/details(id=${user.id})}" th:text="${user.firstName}">Иван</a>
         </td>
         <td th:text="${user.lastName}">Иванов</td>
         <td th:text="${user.email}">ivan@mail.com</td>
         <td th:text="${user.age}">25</td>
+        <td>
+            <!-- Добавлено отображение ролей для наглядности -->
+            <span th:each="role : ${user.roles}"
+                  th:if="${role.name.startsWith('ROLE_')}"
+                  class="roles-badge"
+                  th:text="${role.name.replace('ROLE_', '')}"></span>
+        </td>
     </tr>
     </tbody>
 </table>
 
-<a th:href="@{/users/add}" class="btn-add">
-    + Добавить нового пользователя
-</a>
+<div style="display: flex; flex-direction: column; align-items: center;">
+    <a th:href="@{/users/add}" class="btn-add">
+        + Добавить нового пользователя
+    </a>
+
+    <form th:action="@{/logout}" method="post">
+        <button type="submit" class="btn-logout">
+            Выйти из системы
+        </button>
+    </form>
+</div>
 
 </body>
 </html>

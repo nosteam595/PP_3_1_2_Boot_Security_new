@@ -1,7 +1,6 @@
 package nosteam.IdeaProjects.PP_3_1_2_Boot_Security_new.dao;
 
 import nosteam.IdeaProjects.PP_3_1_2_Boot_Security_new.model.User;
-
 import java.util.List;
 
 public interface UserDao {

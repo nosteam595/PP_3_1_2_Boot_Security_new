@@ -13,7 +13,6 @@
             background-color: #f9f9f9;
         }
 
-        /* Группа: поле + ошибка */
         .form-group {
             width: 350px;
             margin-bottom: 15px;
@@ -22,15 +21,16 @@
         .form-row {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start; /* Изменил для выравнивания списка ролей */
         }
 
-        label {
+        label.main-label {
             font-weight: bold;
             margin-right: 10px;
+            margin-top: 5px;
         }
 
-        input {
+        input[type="text"], input[type="email"], input[type="number"], input[type="password"] {
             width: 200px;
             padding: 5px;
             border: 1px solid #ccc;
@@ -38,12 +38,30 @@
             box-sizing: border-box;
         }
 
+        /* Контейнер для чекбоксов */
+        .roles-container {
+            width: 200px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .role-item {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        .role-item input {
+            width: auto;
+            margin-right: 8px;
+        }
+
         .input-error {
             border: 1px solid #d9534f;
             background-color: #fff6f6;
         }
 
-        /* Ошибка теперь занимает место по факту появления */
         .error-message {
             display: block;
             text-align: right;
@@ -79,7 +97,7 @@
     <!-- Имя -->
     <div class="form-group">
         <div class="form-row">
-            <label for="firstName">Имя:</label>
+            <label class="main-label" for="firstName">Имя:</label>
             <input type="text" th:field="*{firstName}" id="firstName"
                    th:classappend="${#fields.hasErrors('firstName')} ? 'input-error' : ''" />
         </div>
@@ -89,7 +107,7 @@
     <!-- Фамилия -->
     <div class="form-group">
         <div class="form-row">
-            <label for="lastName">Фамилия:</label>
+            <label class="main-label" for="lastName">Фамилия:</label>
             <input type="text" th:field="*{lastName}" id="lastName"
                    th:classappend="${#fields.hasErrors('lastName')} ? 'input-error' : ''" />
         </div>
@@ -99,7 +117,7 @@
     <!-- Email -->
     <div class="form-group">
         <div class="form-row">
-            <label for="email">Email:</label>
+            <label class="main-label" for="email">Email:</label>
             <input type="email" th:field="*{email}" id="email"
                    th:classappend="${#fields.hasErrors('email')} ? 'input-error' : ''" />
         </div>
@@ -109,7 +127,7 @@
     <!-- Возраст -->
     <div class="form-group">
         <div class="form-row">
-            <label for="age">Возраст:</label>
+            <label class="main-label" for="age">Возраст:</label>
             <input type="number" th:field="*{age}" id="age"
                    th:classappend="${#fields.hasErrors('age')} ? 'input-error' : ''" />
         </div>
@@ -119,11 +137,29 @@
     <!-- Пароль -->
     <div class="form-group">
         <div class="form-row">
-            <label for="password">Пароль:</label>
+            <label class="main-label" for="password">Пароль:</label>
             <input type="password" th:field="*{password}" id="password"
                    th:classappend="${#fields.hasErrors('password')} ? 'input-error' : ''" />
         </div>
         <span class="error-message" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
+    </div>
+
+    <!-- Выбор Ролей -->
+    <div class="form-group">
+        <div class="form-row">
+            <label class="main-label">Роли:</label>
+            <div class="roles-container">
+                <div th:each="role : ${allRoles}" class="role-item">
+                    <!-- Заменили th:field на обычный name="listRoles" -->
+                    <input type="checkbox"
+                           name="listRoles"
+                           th:value="${role.id}"
+                           th:id="${'role_' + role.id}" />
+                    <label th:for="${'role_' + role.id}"
+                           th:text="${role.name.replace('ROLE_', '')}"></label>
+                </div>
+            </div>
+        </div>
     </div>
 
     <button type="submit">Сохранить пользователя</button>
