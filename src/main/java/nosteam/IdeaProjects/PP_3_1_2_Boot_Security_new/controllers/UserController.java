@@ -52,7 +52,7 @@ public class UserController {
         }
 
         model.addAttribute("user", userToShow);
-        return "userProfile"; // Возвращаем страницу ПРОСМОТРА
+        return "userProfile";
     }
 
     @GetMapping("/add")
@@ -72,7 +72,7 @@ public class UserController {
         }
         if (bindingResult.hasErrors()) {
             model.addAttribute("allRoles", roleService.getAllRoles());
-            return "userAdd"; // Возвращаем форму добавления с текстом ошибки
+            return "userAdd";
         }
         if (roleIds != null) {
             Set<Role> roles = new HashSet<>();

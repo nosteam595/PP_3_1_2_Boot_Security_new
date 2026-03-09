@@ -10,6 +10,6 @@ public class AuthController {
 
     @GetMapping("/login")
     public String loginPage() {
-        return "auth/login"; // Файл должен лежать в: src/main/resources/templates/auth/login.html
+        return "auth/login";
     }
 }
