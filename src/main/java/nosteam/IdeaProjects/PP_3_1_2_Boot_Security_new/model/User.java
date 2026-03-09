@@ -31,8 +31,6 @@ public class User {
     @Column(name = "age")
     private int age;
 
-    @NotEmpty(message = "Пароль не должен быть пустым")
-    @Size(min = 2, message = "Пароль должен быть не менее 2 символов")
     @Column(name = "password", length = 100)
     private String password;
 

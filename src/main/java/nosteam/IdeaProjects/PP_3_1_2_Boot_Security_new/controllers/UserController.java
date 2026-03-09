@@ -55,7 +55,6 @@ public class UserController {
         return "userProfile";
     }
 
-
     @GetMapping("/add")
     public String addNewUser(ModelMap modelMap) {
         modelMap.addAttribute("user", new User());
@@ -68,10 +67,12 @@ public class UserController {
                            BindingResult bindingResult,
                            @RequestParam(value = "listRoles", required = false) List<Long> roleIds,
                            Model model) {
-
+        if (user.getPassword() == null || user.getPassword().isEmpty()) {
+            bindingResult.rejectValue("password", "error.user", "Пароль обязателен при создании");
+        }
         if (bindingResult.hasErrors()) {
             model.addAttribute("allRoles", roleService.getAllRoles());
-            return "userAdd";
+            return "userAdd"; // Возвращаем форму добавления с текстом ошибки
         }
         if (roleIds != null) {
             Set<Role> roles = new HashSet<>();
@@ -80,25 +81,51 @@ public class UserController {
             }
             user.setRoles(roles);
         }
-
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userService.addUser(user);
+        return "redirect:/users";
+    }
+
+    @GetMapping("/edit")
+    public String editUserPage(@RequestParam("id") Long id, Model model) {
+        model.addAttribute("user", userService.getUser(id));
+        model.addAttribute("allRoles", roleService.getAllRoles());
+        return "userEdit";
+    }
+
+    @PostMapping("/update")
+    public String updateUser(@ModelAttribute("user") @Valid User user,
+                             BindingResult bindingResult,
+                             @RequestParam(value = "listRoles", required = false) List<Long> roleIds,
+                             Model model) {
+        if (user.getPassword() == null || user.getPassword().isEmpty()) {
+            User oldUser = userService.getUser(user.getId());
+            user.setPassword(oldUser.getPassword());
+        } else {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+        }
+        if (bindingResult.hasFieldErrors("firstName") ||
+                bindingResult.hasFieldErrors("lastName") ||
+                bindingResult.hasFieldErrors("email") ||
+                bindingResult.hasFieldErrors("age")) {
+
+            model.addAttribute("allRoles", roleService.getAllRoles());
+            return "userEdit";
+        }
+        if (roleIds != null) {
+            Set<Role> roles = new HashSet<>();
+            for (Long roleId : roleIds) {
+                roles.add(roleService.getRoleById(roleId));
+            }
+            user.setRoles(roles);
+        }
+        userService.updateUser(user);
         return "redirect:/users";
     }
 
     @PostMapping("/remove")
     public String removeUser(@ModelAttribute("user") User user) {
         userService.removeUser(user);
-        return "redirect:/users";
-    }
-
-    @PostMapping("/update")
-    public String updateUser(@ModelAttribute("user") @Valid User user,
-                             BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return "userUpdateRemove";
-        }
-        userService.updateUser(user);
         return "redirect:/users";
     }
 }
