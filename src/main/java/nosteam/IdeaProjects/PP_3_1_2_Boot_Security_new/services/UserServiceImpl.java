@@ -2,7 +2,6 @@ package nosteam.IdeaProjects.PP_3_1_2_Boot_Security_new.services;
 
 import nosteam.IdeaProjects.PP_3_1_2_Boot_Security_new.dao.UserDao;
 import nosteam.IdeaProjects.PP_3_1_2_Boot_Security_new.model.User;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
@@ -36,14 +35,8 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public void registerNewUser(User user, List<Long> roleIds) {
-        userDao.registerNewUser(user, roleIds);
-    }
-
-    @Transactional
-    @Override
-    public void addUser(User user) {
-        userDao.addUser(user);
+    public void addUser(User user, List<Long> roleIds) {
+        userDao.addUser(user, roleIds);
     }
 
     @Transactional
@@ -54,8 +47,8 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public void updateUser(User userToUpdate) {
-        userDao.updateUser(userToUpdate);
+    public void updateUser(User updatedUser, List<Long> roleIds) {
+        userDao.updateUser(updatedUser, roleIds);
     }
 
 }

@@ -24,12 +24,10 @@ public class UserController {
 
     private final UserService userService;
     private final RoleService roleService;
-    private final PasswordEncoder passwordEncoder;
 
-    public UserController(UserService userService, RoleService roleService, PasswordEncoder passwordEncoder) {
+    public UserController(UserService userService, RoleService roleService) {
         this.userService = userService;
         this.roleService = roleService;
-        this.passwordEncoder = passwordEncoder;
     }
 
     @GetMapping
@@ -63,7 +61,7 @@ public class UserController {
             model.addAttribute("allRoles", roleService.getAllRoles());
             return "userAdd";
         }
-        userService.registerNewUser(user, roleIds);
+        userService.addUser(user, roleIds);
         return "redirect:/users";
     }
 
@@ -79,28 +77,11 @@ public class UserController {
                              BindingResult bindingResult,
                              @RequestParam(value = "listRoles", required = false) List<Long> roleIds,
                              Model model) {
-        if (user.getPassword() == null || user.getPassword().isEmpty()) {
-            User oldUser = userService.getUser(user.getId());
-            user.setPassword(oldUser.getPassword());
-        } else {
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
-        }
-        if (bindingResult.hasFieldErrors("firstName") ||
-                bindingResult.hasFieldErrors("lastName") ||
-                bindingResult.hasFieldErrors("email") ||
-                bindingResult.hasFieldErrors("age")) {
-
+        if (bindingResult.hasErrors()) {
             model.addAttribute("allRoles", roleService.getAllRoles());
             return "userEdit";
         }
-        if (roleIds != null) {
-            Set<Role> roles = new HashSet<>();
-            for (Long roleId : roleIds) {
-                roles.add(roleService.getRoleById(roleId));
-            }
-            user.setRoles(roles);
-        }
-        userService.updateUser(user);
+        userService.updateUser(user, roleIds);
         return "redirect:/users";
     }
 

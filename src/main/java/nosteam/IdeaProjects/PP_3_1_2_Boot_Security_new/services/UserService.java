@@ -7,8 +7,7 @@ public interface UserService {
     List<User> allUsers();
     User getUser(long id);
     User getUserForProfile(User currentUser, Long id);
-    void registerNewUser(User user, List<Long> roleIds);
-    void addUser(User user);
+    void addUser(User user, List<Long> roleIds);
     void removeUser(User user);
-    void updateUser(User userToUpdate);
+    void updateUser(User updatedUser, List<Long> roleIds);
 }
